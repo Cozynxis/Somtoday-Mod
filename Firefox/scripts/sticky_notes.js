@@ -2,7 +2,8 @@
     'use strict';
 
     const STORAGE_KEY = 'somtoday_mod_sticky_notes_v1';
-    const ENABLED_KEY = 'somtoday_mod_sticky_notes_enabled_v1';
+    const INIT_KEY = 'somtoday_mod_sticky_notes_setting_initialized_v2';
+    const BOOL_INDEX = 18;
     const ROOT_ID = 'stm-sticky-notes';
     const MODAL_ID = 'stm-sticky-modal';
     const SETTING_ID = 'stm-sticky-notes-setting';
@@ -11,8 +12,9 @@
 
     async function loadNotes(){try{return(await storage().get(STORAGE_KEY))[STORAGE_KEY]||[]}catch{return[]}}
     async function saveNotes(notes){try{await storage().set({[STORAGE_KEY]:notes})}catch{}}
-    async function isEnabled(){try{const result=await storage().get(ENABLED_KEY);return result[ENABLED_KEY]!==false}catch{return true}}
-    async function setEnabled(value){try{await storage().set({[ENABLED_KEY]:value})}catch{};if(!value)cleanup();else mount()}
+    function replaceBool(index,value){let bools=get('bools')||'110001110111101111100000000000';while(bools.length<=index)bools+='0';set('bools',bools.substring(0,index)+(value?'1':'0')+bools.substring(index+1))}
+    function isEnabled(){const bools=get('bools');return !bools||bools.charAt(BOOL_INDEX)!=='0'}
+    async function ensureDefaultEnabled(){try{const result=await storage().get(INIT_KEY);if(result[INIT_KEY])return;replaceBool(BOOL_INDEX,true);await storage().set({[INIT_KEY]:true})}catch{}}
     function esc(value=''){const div=document.createElement('div');div.textContent=value;return div.innerHTML}
     function isVisible(element){if(!element)return false;const rect=element.getBoundingClientRect(),style=getComputedStyle(element);return rect.width>0&&rect.height>0&&style.display!=='none'&&style.visibility!=='hidden'}
     function getVisibleHome(){return[...document.querySelectorAll('sl-home')].find(isVisible)||null}
@@ -28,7 +30,7 @@
     function createPanel(){const root=document.createElement('section');root.id=ROOT_ID;root.className='stm-sticky-panel';root.innerHTML=`<div class="stm-sticky-panel-header"><div><span class="stm-sticky-kicker">Somtoday Mod</span><h3>Sticky Notes</h3></div><span class="stm-sticky-pin">●</span></div><button type="button" class="stm-sticky-add">+ <span>Sticky Note Maken</span></button><div id="stm-sticky-list" class="stm-sticky-list"></div>`;root.querySelector('.stm-sticky-add').addEventListener('click',()=>openModal());return root}
     function cleanup(){document.getElementById(ROOT_ID)?.remove();document.querySelectorAll(`.${HOME_CLASS}`).forEach(el=>el.classList.remove(HOME_CLASS))}
 
-    async function injectSetting(){
+    function injectSetting(){
         const category=document.getElementById('category-extra');
         if(!category||document.getElementById(SETTING_ID))return;
         const tasksCheckbox=category.querySelector('#bools16');
@@ -42,23 +44,15 @@
         const label=row.querySelector('label.switch');
         if(!checkbox||!label)return;
         if(title)title.textContent='Sticky Notes op startpagina';
-        checkbox.id='somtoday_mod_sticky_notes_enabled_v1';
+        checkbox.id='bools18';
         checkbox.title='Sticky Notes op startpagina';
         checkbox.classList.add('mod-custom-setting');
         checkbox.classList.remove('mod-modified');
-        checkbox.setAttribute('oninput',"this.classList.add('mod-modified');");
-        label.setAttribute('for',checkbox.id);
-        checkbox.checked=await isEnabled();
+        label.setAttribute('for','bools18');
+        checkbox.checked=isEnabled();
         tasksRow.insertAdjacentElement('afterend',row);
     }
 
-    async function syncSavedSetting(){
-        const checkbox=document.getElementById('somtoday_mod_sticky_notes_enabled_v1');
-        if(!checkbox)return;
-        const saved=await isEnabled();
-        if(checkbox.checked!==saved&&!checkbox.classList.contains('mod-modified'))checkbox.checked=saved;
-    }
-
-    async function mount(){injectSetting();syncSavedSetting();if(!(await isEnabled())){cleanup();return}const home=getVisibleHome();if(!home){cleanup();return}document.querySelectorAll(`.${HOME_CLASS}`).forEach(el=>{if(el!==home)el.classList.remove(HOME_CLASS)});home.classList.add(HOME_CLASS);const existing=document.getElementById(ROOT_ID),root=existing||createPanel();if(root.parentElement!==home)home.appendChild(root);if(!positionPanel(home,root)){root.remove();return}if(!existing)renderNotes()}
-    let timer;const observer=new MutationObserver(()=>{clearTimeout(timer);timer=setTimeout(mount,100)});observer.observe(document.documentElement,{childList:true,subtree:true});window.addEventListener('hashchange',mount);window.addEventListener('popstate',mount);window.addEventListener('resize',()=>{clearTimeout(timer);timer=setTimeout(mount,80)});setInterval(mount,900);setTimeout(mount,200);
+    function mount(){injectSetting();if(!isEnabled()){cleanup();return}const home=getVisibleHome();if(!home){cleanup();return}document.querySelectorAll(`.${HOME_CLASS}`).forEach(el=>{if(el!==home)el.classList.remove(HOME_CLASS)});home.classList.add(HOME_CLASS);const existing=document.getElementById(ROOT_ID),root=existing||createPanel();if(root.parentElement!==home)home.appendChild(root);if(!positionPanel(home,root)){root.remove();return}if(!existing)renderNotes()}
+    let timer;const observer=new MutationObserver(()=>{clearTimeout(timer);timer=setTimeout(mount,100)});observer.observe(document.documentElement,{childList:true,subtree:true});window.addEventListener('hashchange',mount);window.addEventListener('popstate',mount);window.addEventListener('resize',()=>{clearTimeout(timer);timer=setTimeout(mount,80)});setInterval(mount,900);ensureDefaultEnabled().then(mount);setTimeout(mount,200);
 })();
