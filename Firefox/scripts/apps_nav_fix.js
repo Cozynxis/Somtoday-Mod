@@ -4,11 +4,8 @@
     const STYLE_ID = 'stm-apps-nav-layout-fix';
 
     function getLayout() {
-        try {
-            return String(get('layout') || '1');
-        } catch {
-            return '1';
-        }
+        try { return String(get('layout') || '1'); }
+        catch { return '1'; }
     }
 
     function ensureStyles() {
@@ -17,67 +14,131 @@
         style = document.createElement('style');
         style.id = STYLE_ID;
         style.textContent = `
+            /* Apps button: follow Somtoday Mod's own menu geometry instead of creating a second layout. */
+            .stm-apps-nav-item { cursor: pointer !important; }
             .stm-apps-nav-item .item > i,
             .stm-apps-nav-item i.stm-apps-nav-icon {
                 box-sizing: border-box !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                padding: 0 !important;
                 overflow: visible !important;
-                flex: 0 0 auto !important;
+                color: inherit !important;
             }
-            .stm-apps-nav-item .item > i svg,
-            .stm-apps-nav-item i.stm-apps-nav-icon svg {
+            .stm-apps-nav-item svg {
                 display: block !important;
-                width: 24px !important;
-                height: 24px !important;
-                min-width: 24px !important;
-                min-height: 24px !important;
-                max-width: 24px !important;
-                max-height: 24px !important;
                 fill: currentColor !important;
+                pointer-events: none !important;
             }
-            body:not(.stm-apps-sidebar-layout) .stm-apps-nav-item .item > i,
-            body:not(.stm-apps-sidebar-layout) .stm-apps-nav-item i.stm-apps-nav-icon {
-                width: 30px !important;
-                height: 30px !important;
-                min-width: 30px !important;
-                min-height: 30px !important;
-                margin: 0 auto !important;
+
+            /* Normal / compact / centred layouts. */
+            body.stm-apps-layout-1 .stm-apps-nav-item .item > i,
+            body.stm-apps-layout-4 .stm-apps-nav-item .item > i,
+            body.stm-apps-layout-5 .stm-apps-nav-item .item > i,
+            body.stm-apps-layout-1 .stm-apps-nav-item i.stm-apps-nav-icon,
+            body.stm-apps-layout-4 .stm-apps-nav-item i.stm-apps-nav-icon,
+            body.stm-apps-layout-5 .stm-apps-nav-item i.stm-apps-nav-icon {
+                display:flex !important;
+                align-items:center !important;
+                justify-content:center !important;
+                width:32px !important;
+                height:32px !important;
+                min-width:32px !important;
+                min-height:32px !important;
+                padding:0 !important;
+                margin:0 auto !important;
             }
-            body.stm-apps-sidebar-layout .stm-apps-nav-item .item > i,
-            body.stm-apps-sidebar-layout .stm-apps-nav-item i.stm-apps-nav-icon {
-                width: 100% !important;
-                height: 40px !important;
-                min-height: 40px !important;
-                margin: 0 !important;
+            body.stm-apps-layout-1 .stm-apps-nav-item svg,
+            body.stm-apps-layout-4 .stm-apps-nav-item svg,
+            body.stm-apps-layout-5 .stm-apps-nav-item svg {
+                width:24px !important;
+                height:24px !important;
+                min-width:24px !important;
+                min-height:24px !important;
+                max-width:24px !important;
+                max-height:24px !important;
             }
-            body:not(.stm-apps-sidebar-layout) sl-tab-bar:has(.stm-apps-nav-item) {
-                overflow-y: visible !important;
+
+            /* Left and right sidebar: use the exact same dimensions as the existing sidebar items. */
+            body.stm-apps-layout-2 .stm-apps-nav-item .item > i,
+            body.stm-apps-layout-3 .stm-apps-nav-item .item > i,
+            body.stm-apps-layout-2 .stm-apps-nav-item i.stm-apps-nav-icon,
+            body.stm-apps-layout-3 .stm-apps-nav-item i.stm-apps-nav-icon {
+                display:block !important;
+                box-sizing:border-box !important;
+                width:100% !important;
+                height:40px !important;
+                min-height:40px !important;
+                padding:0 !important;
+                margin:0 !important;
             }
-            body.stm-apps-sidebar-layout sl-header sl-tab-bar:has(.stm-apps-nav-item) {
-                box-sizing: border-box !important;
-                overflow-x: hidden !important;
-                overflow-y: auto !important;
-                overscroll-behavior: contain !important;
-                scrollbar-width: none !important;
-                padding-bottom: 0 !important;
-                justify-content: flex-start !important;
-                align-content: flex-start !important;
+            @media (min-width:1280px) {
+                body.stm-apps-layout-2 .stm-apps-nav-item .item > i,
+                body.stm-apps-layout-3 .stm-apps-nav-item .item > i,
+                body.stm-apps-layout-2 .stm-apps-nav-item i.stm-apps-nav-icon,
+                body.stm-apps-layout-3 .stm-apps-nav-item i.stm-apps-nav-icon {
+                    padding-top:23px !important;
+                    height:63px !important;
+                }
             }
-            body.stm-apps-sidebar-layout sl-header sl-tab-bar:has(.stm-apps-nav-item)::-webkit-scrollbar {
-                display: none !important;
+            body.stm-apps-layout-2 .stm-apps-nav-item svg,
+            body.stm-apps-layout-3 .stm-apps-nav-item svg {
+                width:100% !important;
+                height:40px !important;
+                min-width:0 !important;
+                min-height:40px !important;
+                max-width:none !important;
+                max-height:40px !important;
             }
-            body.stm-apps-sidebar-layout sl-header sl-tab-bar:has(.stm-apps-nav-item) > sl-tab-item {
-                flex: 0 0 auto !important;
+
+            /* Never turn the whole original sidebar into our own positioned/scrollable panel. */
+            body.stm-apps-layout-2 sl-header sl-tab-bar:has(.stm-apps-nav-item),
+            body.stm-apps-layout-3 sl-header sl-tab-bar:has(.stm-apps-nav-item) {
+                overflow-x:hidden !important;
+                scrollbar-width:none !important;
+                overscroll-behavior:contain !important;
             }
-            body.stm-apps-sidebar-layout .menu-avatar,
-            body.stm-apps-sidebar-layout sl-header > div:first-of-type {
-                transform: none !important;
+            body.stm-apps-layout-2 sl-header sl-tab-bar:has(.stm-apps-nav-item)::-webkit-scrollbar,
+            body.stm-apps-layout-3 sl-header sl-tab-bar:has(.stm-apps-nav-item)::-webkit-scrollbar { display:none !important; }
+
+            /* Apps must behave as a real page: fully cover the current Somtoday content. */
+            #stm-apps-page {
+                z-index:14 !important;
+                background:var(--bg-neutral-none) !important;
+                isolation:isolate !important;
+            }
+            body.stm-apps-layout-2 #stm-apps-page {
+                top:0 !important;
+                left:var(--safe-area-inset-left,100px) !important;
+                right:0 !important;
+                bottom:0 !important;
+            }
+            body.stm-apps-layout-3 #stm-apps-page {
+                top:0 !important;
+                left:0 !important;
+                right:var(--safe-area-inset-right,100px) !important;
+                bottom:0 !important;
+            }
+            body.stm-apps-layout-1 #stm-apps-page,
+            body.stm-apps-layout-4 #stm-apps-page,
+            body.stm-apps-layout-5 #stm-apps-page {
+                top:64px !important;
+                bottom:var(--safe-area-inset-bottom,0) !important;
+            }
+            body.stm-apps-layout-4 #stm-apps-page {
+                left:var(--safe-area-inset-left,0) !important;
+                right:var(--safe-area-inset-right,0) !important;
             }
         `;
         document.head.appendChild(style);
+    }
+
+    function clearOldBrokenOverrides() {
+        /* Remove only properties the previous Apps navigation fix wrote inline. */
+        document.querySelectorAll('sl-header sl-tab-bar').forEach(bar => {
+            if (!bar.querySelector('.stm-apps-nav-item')) return;
+            ['position','top','bottom','height','max-height','overflow-y','overflow-x'].forEach(p => bar.style.removeProperty(p));
+        });
+        document.querySelectorAll('sl-header .menu-avatar, sl-header > div:first-of-type').forEach(el => {
+            ['position','top','bottom','left','right','width','transform'].forEach(p => el.style.removeProperty(p));
+        });
     }
 
     function cleanWrongNavCopies() {
@@ -86,101 +147,59 @@
         });
     }
 
-    function resetSidebarInlineStyles() {
-        document.querySelectorAll('sl-header sl-tab-bar').forEach(bar => {
-            if (!bar.querySelector('.stm-apps-nav-item')) return;
-            bar.style.removeProperty('top');
-            bar.style.removeProperty('bottom');
-            bar.style.removeProperty('height');
-            bar.style.removeProperty('max-height');
-            bar.style.removeProperty('overflow-y');
-            bar.style.removeProperty('overflow-x');
-        });
-        document.querySelectorAll('.menu-avatar, sl-header > div:first-of-type').forEach(el => {
-            el.style.removeProperty('top');
-            el.style.removeProperty('bottom');
-            el.style.removeProperty('left');
-            el.style.removeProperty('right');
-            el.style.removeProperty('width');
-            el.style.removeProperty('position');
-            el.style.removeProperty('transform');
-        });
+    function applyLayoutClass() {
+        const layout = getLayout();
+        if (!document.body) return layout;
+        for (let i=1;i<=5;i++) document.body.classList.toggle(`stm-apps-layout-${i}`, layout===String(i));
+        return layout;
     }
 
-    function fixSidebar(layout) {
-        const header = document.querySelector('sl-header');
-        if (!header) return;
-        const bar = [...header.querySelectorAll('sl-tab-bar')].find(el => el.querySelector('.stm-apps-nav-item'));
-        if (!bar) return;
+    function matchAppsItemToSibling(item, layout) {
+        const sibling = [...(item.parentElement?.children || [])].find(el => el !== item && el.matches?.('sl-tab-item'));
+        if (!sibling) return;
 
-        const profile = header.querySelector('.menu-avatar') || header.querySelector(':scope > div:first-of-type');
-        const logo = document.getElementById('mod-logo-wrapper');
-        const headerRect = header.getBoundingClientRect();
-
-        let top = 0;
-        if (logo) {
-            const logoRect = logo.getBoundingClientRect();
-            if (logoRect.height > 0) top = Math.max(0, Math.round(logoRect.bottom - headerRect.top));
+        /* Keep the cloned button using the same item dimensions as its neighbours. */
+        const siblingItem = sibling.querySelector('.item');
+        const appItem = item.querySelector('.item');
+        if (siblingItem && appItem) {
+            const cs = getComputedStyle(siblingItem);
+            if (cs.height && cs.height !== '0px') appItem.style.height = cs.height;
+            appItem.style.minHeight = cs.minHeight;
+            appItem.style.maxHeight = cs.maxHeight;
         }
 
-        let bottom = 84;
-        if (profile) {
-            const profileRect = profile.getBoundingClientRect();
-            if (profileRect.height > 0) {
-                bottom = Math.max(72, Math.round(headerRect.bottom - profileRect.top + 8));
-            }
+        const icon = item.querySelector('i');
+        const svg = icon?.querySelector('svg');
+        if (icon) icon.setAttribute('aria-hidden','true');
+        if (svg) {
+            svg.removeAttribute('width');
+            svg.removeAttribute('height');
+            svg.style.removeProperty('width');
+            svg.style.removeProperty('height');
         }
 
-        bar.style.setProperty('position', 'absolute', 'important');
-        bar.style.setProperty('top', `${top}px`, 'important');
-        bar.style.setProperty('bottom', `${bottom}px`, 'important');
-        bar.style.setProperty('height', 'auto', 'important');
-        bar.style.setProperty('max-height', `calc(100vh - ${top + bottom}px)`, 'important');
-        bar.style.setProperty('overflow-y', 'auto', 'important');
-        bar.style.setProperty('overflow-x', 'hidden', 'important');
-        bar.scrollTop = Math.min(bar.scrollTop, Math.max(0, bar.scrollHeight - bar.clientHeight));
-
-        if (profile) {
-            profile.style.setProperty('position', 'fixed', 'important');
-            profile.style.setProperty('top', 'auto', 'important');
-            profile.style.setProperty('bottom', '12px', 'important');
-            profile.style.setProperty('transform', 'none', 'important');
-            profile.style.setProperty('width', 'calc(100px - 24px)', 'important');
-            if (layout === '3') {
-                profile.style.setProperty('right', '12px', 'important');
-                profile.style.setProperty('left', 'auto', 'important');
-            } else {
-                profile.style.setProperty('left', '12px', 'important');
-                profile.style.setProperty('right', 'auto', 'important');
-            }
+        /* Sidebar layouts already have the correct sizing rules in main_functions.js. */
+        if (layout === '2' || layout === '3') {
+            item.style.removeProperty('height');
+            item.style.removeProperty('max-height');
         }
     }
 
     function fixAppsNavigation() {
         ensureStyles();
+        clearOldBrokenOverrides();
         cleanWrongNavCopies();
+        const layout = applyLayoutClass();
 
-        const layout = getLayout();
-        const sidebar = layout === '2' || layout === '3';
-        document.body?.classList.toggle('stm-apps-sidebar-layout', sidebar);
+        document.querySelectorAll('sl-header .stm-apps-nav-item').forEach(item => matchAppsItemToSibling(item, layout));
 
-        if (sidebar) {
-            fixSidebar(layout);
-        } else {
-            resetSidebarInlineStyles();
+        /* Keep scroll position legal, but never create extra empty scroll space. */
+        if (layout === '2' || layout === '3') {
+            document.querySelectorAll('sl-header sl-tab-bar:has(.stm-apps-nav-item)').forEach(bar => {
+                const max = Math.max(0, bar.scrollHeight - bar.clientHeight);
+                if (bar.scrollTop > max) bar.scrollTop = max;
+            });
         }
-
-        document.querySelectorAll('.stm-apps-nav-item').forEach(item => {
-            const icon = item.querySelector('i');
-            const svg = icon?.querySelector('svg');
-            if (icon) icon.setAttribute('aria-hidden', 'true');
-            if (svg) {
-                svg.setAttribute('width', '24');
-                svg.setAttribute('height', '24');
-                svg.style.width = '24px';
-                svg.style.height = '24px';
-            }
-        });
     }
 
     let scheduled = false;
@@ -194,7 +213,7 @@
     }
 
     const observer = new MutationObserver(scheduleFix);
-    observer.observe(document.documentElement, { childList: true, subtree: true });
+    observer.observe(document.documentElement, {childList:true, subtree:true});
     window.addEventListener('resize', scheduleFix);
     window.addEventListener('hashchange', scheduleFix);
     window.addEventListener('popstate', scheduleFix);
