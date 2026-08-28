@@ -46,12 +46,36 @@
         if(title)title.textContent='Sticky Notes op startpagina';
         checkbox.id='bools18';
         checkbox.title='Sticky Notes op startpagina';
-        checkbox.classList.add('mod-custom-setting');
-        checkbox.classList.remove('mod-modified');
+        checkbox.className='mod-custom-setting';
+        checkbox.removeAttribute('oninput');
         label.setAttribute('for','bools18');
         checkbox.checked=isEnabled();
+        checkbox.addEventListener('change',()=>checkbox.classList.add('mod-modified'));
+        label.addEventListener('click',event=>{
+            if(event.target===checkbox)return;
+            event.preventDefault();
+            checkbox.checked=!checkbox.checked;
+            checkbox.dispatchEvent(new Event('change',{bubbles:true}));
+        });
         tasksRow.insertAdjacentElement('afterend',row);
     }
+
+    function savePendingSetting(){
+        const checkbox=document.getElementById('bools18');
+        if(!checkbox)return;
+        replaceBool(BOOL_INDEX,checkbox.checked);
+        checkbox.classList.remove('mod-modified');
+    }
+
+    document.addEventListener('click',event=>{
+        const button=event.target.closest?.('button,hmy-button');
+        if(!button)return;
+        const text=(button.textContent||'').trim();
+        if(button.id==='save'||/instellingen\s+opslaan/i.test(text)){
+            savePendingSetting();
+            setTimeout(mount,60);
+        }
+    },true);
 
     function mount(){injectSetting();if(!isEnabled()){cleanup();return}const home=getVisibleHome();if(!home){cleanup();return}document.querySelectorAll(`.${HOME_CLASS}`).forEach(el=>{if(el!==home)el.classList.remove(HOME_CLASS)});home.classList.add(HOME_CLASS);const existing=document.getElementById(ROOT_ID),root=existing||createPanel();if(root.parentElement!==home)home.appendChild(root);if(!positionPanel(home,root)){root.remove();return}if(!existing)renderNotes()}
     let timer;const observer=new MutationObserver(()=>{clearTimeout(timer);timer=setTimeout(mount,100)});observer.observe(document.documentElement,{childList:true,subtree:true});window.addEventListener('hashchange',mount);window.addEventListener('popstate',mount);window.addEventListener('resize',()=>{clearTimeout(timer);timer=setTimeout(mount,80)});setInterval(mount,900);ensureDefaultEnabled().then(mount);setTimeout(mount,200);
