@@ -1,30 +1,31 @@
 // SERVICE WORKER
-const NEW_FEATURES_DEFAULT_VERSION = '5.6';
-const NEW_FEATURES_MARKER = `somtoday_mod_new_features_enabled_${NEW_FEATURES_DEFAULT_VERSION}`;
 
-function enableNewFeaturesOnce() {
-    chrome.storage.local.get([NEW_FEATURES_MARKER, 'bools'], result => {
-        if (result[NEW_FEATURES_MARKER]) return;
+function enableNewFeatures() {
+    // Sticky Notes = bools19, Apps = bools20.
+    // Always enable both when this extension is installed or updated so every
+    // user sees the newly introduced features at least once.
+    return chrome.storage.local.get('bools').then(({ bools }) => {
+        let value = typeof bools === 'string' && bools.length
+            ? bools
+            : '110001110111101111100000000000';
 
-        let bools = result.bools || '110001110111101111100000000000';
-        while (bools.length <= 20) bools += '0';
-        bools = bools.substring(0, 19) + '1' + bools.substring(20); // Sticky Notes
-        bools = bools.substring(0, 20) + '1' + bools.substring(21); // Apps
+        while (value.length <= 20) value += '0';
+        value = value.substring(0, 19) + '1' + value.substring(20);
+        value = value.substring(0, 20) + '1' + value.substring(21);
 
-        chrome.storage.local.set({
-            bools,
-            [NEW_FEATURES_MARKER]: true
-        });
+        return chrome.storage.local.set({ bools: value });
     });
 }
 
-chrome.runtime.onInstalled.addListener(({ reason }) => {
-    if (reason == chrome.runtime.OnInstalledReason.INSTALL) {
-        chrome.runtime.openOptionsPage();
-        chrome.storage.local.set({ enabled: true });
-        enableNewFeaturesOnce();
-    } else if (reason == chrome.runtime.OnInstalledReason.UPDATE) {
-        enableNewFeaturesOnce();
+chrome.runtime.onInstalled.addListener(details => {
+    if (details.reason === 'install' || details.reason === 'update') {
+        enableNewFeatures().then(() => {
+            if (details.reason === 'install') {
+                chrome.storage.local.set({ enabled: true });
+                chrome.runtime.openOptionsPage();
+            }
+        });
     }
 });
+
 chrome.runtime.setUninstallURL("https://jonazwetsloot.nl/somtoday-mod-bye");
