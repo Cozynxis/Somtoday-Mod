@@ -1,10 +1,6 @@
 (() => {
     'use strict';
 
-    // ==============================
-    // UPDATE LOG CONFIGURATION
-    // Edit this object for every release.
-    // ==============================
     const UPDATE_LOG = {
         enabled: true,
         version: '5.6',
