@@ -21,12 +21,56 @@
         return div.innerHTML;
     }
 
-    function isHome() { return !!document.querySelector('sl-home'); }
+    function isVisible(element) {
+        if (!element) return false;
+        const rect = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+    }
 
-    function findRightColumn(home) {
-        const direct = [...home.children].filter(el => el.nodeType === 1);
-        if (direct.length > 1) return direct[direct.length - 1];
-        return home.querySelector('.right, .right-column, aside, [class*="right"]') || home;
+    function getVisibleHome() {
+        return [...document.querySelectorAll('sl-home')].find(isVisible) || null;
+    }
+
+    function findGradePlacement(home) {
+        const selectors = '[class*="cijfer" i], [id*="cijfer" i], [class*="grade" i], [id*="grade" i]';
+        const candidates = [...home.querySelectorAll(selectors)].filter(isVisible);
+
+        if (!candidates.length) {
+            const textCandidates = [...home.querySelectorAll('h1,h2,h3,h4,h5,p,span,div')]
+                .filter(element => isVisible(element) && /cijfer/i.test((element.textContent || '').trim()));
+            candidates.push(...textCandidates);
+        }
+
+        candidates.sort((a, b) => {
+            const ar = a.getBoundingClientRect();
+            const br = b.getBoundingClientRect();
+            if (Math.abs(ar.top - br.top) > 8) return ar.top - br.top;
+            return ar.right - br.right;
+        });
+
+        for (let i = candidates.length - 1; i >= 0; i--) {
+            let node = candidates[i];
+
+            while (node && node !== home) {
+                const parent = node.parentElement;
+                if (!parent || !home.contains(parent)) break;
+
+                const display = getComputedStyle(parent).display;
+                const parentRect = parent.getBoundingClientRect();
+                const nodeRect = node.getBoundingClientRect();
+                const horizontalLayout = display.includes('flex') || display.includes('grid');
+                const roomForNotes = parentRect.width >= nodeRect.width + 250;
+
+                if (horizontalLayout && roomForNotes) {
+                    return { host: parent, after: node };
+                }
+
+                node = parent;
+            }
+        }
+
+        return null;
     }
 
     async function renderNotes() {
@@ -85,12 +129,19 @@
         }));
         modal.querySelector('.stm-sticky-close').addEventListener('click', closeModal);
         modal.querySelector('.stm-sticky-cancel').addEventListener('click', closeModal);
-        modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+        modal.addEventListener('click', event => { if (event.target === modal) closeModal(); });
         modal.querySelector('.stm-sticky-create').addEventListener('click', async () => {
             const text = modal.querySelector('#stm-sticky-input').value.trim();
             if (!text) { modal.querySelector('#stm-sticky-input').focus(); return; }
             const notes = await loadNotes();
-            notes.unshift({ id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, text, date: modal.querySelector('#stm-sticky-date').value, time: modal.querySelector('#stm-sticky-time').value, subject: modal.querySelector('#stm-sticky-subject').value.trim(), theme });
+            notes.unshift({
+                id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+                text,
+                date: modal.querySelector('#stm-sticky-date').value,
+                time: modal.querySelector('#stm-sticky-time').value,
+                subject: modal.querySelector('#stm-sticky-subject').value.trim(),
+                theme
+            });
             await saveNotes(notes);
             closeModal();
             renderNotes();
@@ -98,24 +149,49 @@
         setTimeout(() => modal.querySelector('#stm-sticky-input')?.focus(), 80);
     }
 
-    function mount() {
-        if (!isHome()) { document.getElementById(ROOT_ID)?.remove(); return; }
-        if (document.getElementById(ROOT_ID)) return;
-        const home = document.querySelector('sl-home');
-        if (!home) return;
-        const column = findRightColumn(home);
+    function createPanel() {
         const root = document.createElement('section');
         root.id = ROOT_ID;
         root.className = 'stm-sticky-panel';
         root.innerHTML = `<div class="stm-sticky-panel-header"><div><span class="stm-sticky-kicker">Somtoday Mod</span><h3>Sticky Notes</h3></div><span class="stm-sticky-pin">●</span></div><button type="button" class="stm-sticky-add">+ <span>Sticky Note Maken</span></button><div id="stm-sticky-list" class="stm-sticky-list"></div>`;
-        column.appendChild(root);
         root.querySelector('.stm-sticky-add').addEventListener('click', openModal);
-        renderNotes();
+        return root;
+    }
+
+    function mount() {
+        const home = getVisibleHome();
+        const existing = document.getElementById(ROOT_ID);
+
+        // Somtoday keeps parts of pages in the DOM during navigation. Only show
+        // the panel when the actual, visible start page is active.
+        if (!home) {
+            existing?.remove();
+            return;
+        }
+
+        const placement = findGradePlacement(home);
+        if (!placement) {
+            existing?.remove();
+            return;
+        }
+
+        const root = existing || createPanel();
+        if (root.parentElement !== placement.host || root.previousElementSibling !== placement.after) {
+            placement.after.insertAdjacentElement('afterend', root);
+        }
+
+        if (!existing) renderNotes();
     }
 
     let timer;
-    const observer = new MutationObserver(() => { clearTimeout(timer); timer = setTimeout(mount, 100); });
+    const observer = new MutationObserver(() => {
+        clearTimeout(timer);
+        timer = setTimeout(mount, 100);
+    });
+
     observer.observe(document.documentElement, { childList: true, subtree: true });
-    setInterval(mount, 1200);
-    setTimeout(mount, 300);
+    window.addEventListener('hashchange', mount);
+    window.addEventListener('popstate', mount);
+    setInterval(mount, 900);
+    setTimeout(mount, 250);
 })();
