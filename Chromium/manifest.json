@@ -24,8 +24,7 @@
                 "scripts/the_dungeon.js",
                 "scripts/the_escape.js",
                 "scripts/grade_defender.js",
-                "scripts/gradient_background.js",
-                "scripts/update_log.js"
+                "scripts/gradient_background.js"
             ],
             "css": [
                 "css/night.css",
@@ -37,8 +36,7 @@
                 "css/legacy-platformer.css",
                 "css/minigames.css",
                 "css/easter-eggs.css",
-                "css/gradient-background.css",
-                "css/update-log.css"
+                "css/gradient-background.css"
             ],
             "matches": [
                 "*://*.somtoday.nl/*",
