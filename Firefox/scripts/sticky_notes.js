@@ -31,33 +31,34 @@
     async function injectSetting(){
         const category=document.getElementById('category-extra');
         if(!category||document.getElementById(SETTING_ID))return;
-
         const tasksCheckbox=category.querySelector('#bools16');
         if(!tasksCheckbox)return;
-
         const tasksRow=tasksCheckbox.closest('div');
         if(!tasksRow)return;
-
         const row=tasksRow.cloneNode(true);
         row.id=SETTING_ID;
-
         const title=row.querySelector('h3');
         const checkbox=row.querySelector('input[type="checkbox"]');
         const label=row.querySelector('label.switch');
         if(!checkbox||!label)return;
-
-        if(title)title.textContent='Sticky Notes op Start';
-        checkbox.id='stm-sticky-notes-enabled';
-        checkbox.title='Sticky Notes op Start';
-        checkbox.classList.remove('mod-custom-setting','mod-modified');
-        checkbox.removeAttribute('oninput');
+        if(title)title.textContent='Sticky Notes op startpagina';
+        checkbox.id='somtoday_mod_sticky_notes_enabled_v1';
+        checkbox.title='Sticky Notes op startpagina';
+        checkbox.classList.add('mod-custom-setting');
+        checkbox.classList.remove('mod-modified');
+        checkbox.setAttribute('oninput',"this.classList.add('mod-modified');");
         label.setAttribute('for',checkbox.id);
         checkbox.checked=await isEnabled();
-        checkbox.addEventListener('change',async()=>{await setEnabled(checkbox.checked)});
-
         tasksRow.insertAdjacentElement('afterend',row);
     }
 
-    async function mount(){injectSetting();if(!(await isEnabled())){cleanup();return}const home=getVisibleHome();if(!home){cleanup();return}document.querySelectorAll(`.${HOME_CLASS}`).forEach(el=>{if(el!==home)el.classList.remove(HOME_CLASS)});home.classList.add(HOME_CLASS);const existing=document.getElementById(ROOT_ID),root=existing||createPanel();if(root.parentElement!==home)home.appendChild(root);if(!positionPanel(home,root)){root.remove();return}if(!existing)renderNotes()}
+    async function syncSavedSetting(){
+        const checkbox=document.getElementById('somtoday_mod_sticky_notes_enabled_v1');
+        if(!checkbox)return;
+        const saved=await isEnabled();
+        if(checkbox.checked!==saved&&!checkbox.classList.contains('mod-modified'))checkbox.checked=saved;
+    }
+
+    async function mount(){injectSetting();syncSavedSetting();if(!(await isEnabled())){cleanup();return}const home=getVisibleHome();if(!home){cleanup();return}document.querySelectorAll(`.${HOME_CLASS}`).forEach(el=>{if(el!==home)el.classList.remove(HOME_CLASS)});home.classList.add(HOME_CLASS);const existing=document.getElementById(ROOT_ID),root=existing||createPanel();if(root.parentElement!==home)home.appendChild(root);if(!positionPanel(home,root)){root.remove();return}if(!existing)renderNotes()}
     let timer;const observer=new MutationObserver(()=>{clearTimeout(timer);timer=setTimeout(mount,100)});observer.observe(document.documentElement,{childList:true,subtree:true});window.addEventListener('hashchange',mount);window.addEventListener('popstate',mount);window.addEventListener('resize',()=>{clearTimeout(timer);timer=setTimeout(mount,80)});setInterval(mount,900);setTimeout(mount,200);
 })();
