@@ -32,47 +32,6 @@
         return [...document.querySelectorAll('sl-home')].find(isVisible) || null;
     }
 
-    function findGradePlacement(home) {
-        const selectors = '[class*="cijfer" i], [id*="cijfer" i], [class*="grade" i], [id*="grade" i]';
-        const candidates = [...home.querySelectorAll(selectors)].filter(isVisible);
-
-        if (!candidates.length) {
-            const textCandidates = [...home.querySelectorAll('h1,h2,h3,h4,h5,p,span,div')]
-                .filter(element => isVisible(element) && /cijfer/i.test((element.textContent || '').trim()));
-            candidates.push(...textCandidates);
-        }
-
-        candidates.sort((a, b) => {
-            const ar = a.getBoundingClientRect();
-            const br = b.getBoundingClientRect();
-            if (Math.abs(ar.top - br.top) > 8) return ar.top - br.top;
-            return ar.right - br.right;
-        });
-
-        for (let i = candidates.length - 1; i >= 0; i--) {
-            let node = candidates[i];
-
-            while (node && node !== home) {
-                const parent = node.parentElement;
-                if (!parent || !home.contains(parent)) break;
-
-                const display = getComputedStyle(parent).display;
-                const parentRect = parent.getBoundingClientRect();
-                const nodeRect = node.getBoundingClientRect();
-                const horizontalLayout = display.includes('flex') || display.includes('grid');
-                const roomForNotes = parentRect.width >= nodeRect.width + 250;
-
-                if (horizontalLayout && roomForNotes) {
-                    return { host: parent, after: node };
-                }
-
-                node = parent;
-            }
-        }
-
-        return null;
-    }
-
     async function renderNotes() {
         const list = document.querySelector('#stm-sticky-list');
         if (!list) return;
@@ -167,17 +126,8 @@
             return;
         }
 
-        const placement = findGradePlacement(home);
-        if (!placement) {
-            existing?.remove();
-            return;
-        }
-
         const root = existing || createPanel();
-        if (root.parentElement !== placement.host || root.previousElementSibling !== placement.after) {
-            placement.after.insertAdjacentElement('afterend', root);
-        }
-
+        if (root.parentElement !== document.body) document.body.appendChild(root);
         if (!existing) renderNotes();
     }
 
@@ -190,6 +140,6 @@
     observer.observe(document.documentElement, { childList: true, subtree: true });
     window.addEventListener('hashchange', mount);
     window.addEventListener('popstate', mount);
-    setInterval(mount, 900);
-    setTimeout(mount, 250);
+    setInterval(mount, 700);
+    setTimeout(mount, 200);
 })();
