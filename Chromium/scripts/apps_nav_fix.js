@@ -2,6 +2,42 @@
     'use strict';
 
     const STYLE_ID = 'stm-apps-nav-layout-fix';
+    const DEFAULT_BOOLS = '110001110111101111100000000000';
+    const currentVersion = (() => {
+        try { return chrome.runtime.getManifest().version || 'unknown'; }
+        catch { return 'unknown'; }
+    })();
+    const FEATURE_BOOTSTRAP_KEY = `somtoday_mod_apps_sticky_bootstrap_${currentVersion}_v4`;
+
+    function forceFeatureBitsOn() {
+        let value;
+        try { value = get('bools') || DEFAULT_BOOLS; }
+        catch { value = DEFAULT_BOOLS; }
+        while (value.length <= 20) value += '0';
+        value = value.substring(0, 19) + '1' + value.substring(20);
+        value = value.substring(0, 20) + '1' + value.substring(21);
+        try { set('bools', value); }
+        catch { chrome.storage.local.set({ bools: value }); }
+        return value;
+    }
+
+    async function bootstrapNewFeatures() {
+        try {
+            const result = await chrome.storage.local.get(FEATURE_BOOTSTRAP_KEY);
+            if (result[FEATURE_BOOTSTRAP_KEY]) return;
+            forceFeatureBitsOn();
+            setTimeout(forceFeatureBitsOn, 300);
+            setTimeout(forceFeatureBitsOn, 900);
+            setTimeout(forceFeatureBitsOn, 1800);
+            setTimeout(async () => {
+                forceFeatureBitsOn();
+                await chrome.storage.local.set({ [FEATURE_BOOTSTRAP_KEY]: true });
+            }, 2500);
+        } catch {
+            forceFeatureBitsOn();
+        }
+    }
+    bootstrapNewFeatures();
 
     function getLayout() {
         try { return String(get('layout') || '1'); }
