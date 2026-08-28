@@ -9,136 +9,21 @@
     }
 
     function ensureStyles() {
-        let style = document.getElementById(STYLE_ID);
-        if (style) return;
-        style = document.createElement('style');
+        if (document.getElementById(STYLE_ID)) return;
+        const style = document.createElement('style');
         style.id = STYLE_ID;
         style.textContent = `
-            /* Apps button: follow Somtoday Mod's own menu geometry instead of creating a second layout. */
-            .stm-apps-nav-item { cursor: pointer !important; }
-            .stm-apps-nav-item .item > i,
-            .stm-apps-nav-item i.stm-apps-nav-icon {
-                box-sizing: border-box !important;
-                overflow: visible !important;
-                color: inherit !important;
-            }
-            .stm-apps-nav-item svg {
-                display: block !important;
-                fill: currentColor !important;
-                pointer-events: none !important;
-            }
-
-            /* Normal / compact / centred layouts. */
-            body.stm-apps-layout-1 .stm-apps-nav-item .item > i,
-            body.stm-apps-layout-4 .stm-apps-nav-item .item > i,
-            body.stm-apps-layout-5 .stm-apps-nav-item .item > i,
-            body.stm-apps-layout-1 .stm-apps-nav-item i.stm-apps-nav-icon,
-            body.stm-apps-layout-4 .stm-apps-nav-item i.stm-apps-nav-icon,
-            body.stm-apps-layout-5 .stm-apps-nav-item i.stm-apps-nav-icon {
-                display:flex !important;
-                align-items:center !important;
-                justify-content:center !important;
-                width:32px !important;
-                height:32px !important;
-                min-width:32px !important;
-                min-height:32px !important;
-                padding:0 !important;
-                margin:0 auto !important;
-            }
-            body.stm-apps-layout-1 .stm-apps-nav-item svg,
-            body.stm-apps-layout-4 .stm-apps-nav-item svg,
-            body.stm-apps-layout-5 .stm-apps-nav-item svg {
-                width:24px !important;
-                height:24px !important;
-                min-width:24px !important;
-                min-height:24px !important;
-                max-width:24px !important;
-                max-height:24px !important;
-            }
-
-            /* Left and right sidebar: use the exact same dimensions as the existing sidebar items. */
-            body.stm-apps-layout-2 .stm-apps-nav-item .item > i,
-            body.stm-apps-layout-3 .stm-apps-nav-item .item > i,
-            body.stm-apps-layout-2 .stm-apps-nav-item i.stm-apps-nav-icon,
-            body.stm-apps-layout-3 .stm-apps-nav-item i.stm-apps-nav-icon {
-                display:block !important;
-                box-sizing:border-box !important;
-                width:100% !important;
-                height:40px !important;
-                min-height:40px !important;
-                padding:0 !important;
-                margin:0 !important;
-            }
-            @media (min-width:1280px) {
-                body.stm-apps-layout-2 .stm-apps-nav-item .item > i,
-                body.stm-apps-layout-3 .stm-apps-nav-item .item > i,
-                body.stm-apps-layout-2 .stm-apps-nav-item i.stm-apps-nav-icon,
-                body.stm-apps-layout-3 .stm-apps-nav-item i.stm-apps-nav-icon {
-                    padding-top:23px !important;
-                    height:63px !important;
-                }
-            }
-            body.stm-apps-layout-2 .stm-apps-nav-item svg,
-            body.stm-apps-layout-3 .stm-apps-nav-item svg {
-                width:100% !important;
-                height:40px !important;
-                min-width:0 !important;
-                min-height:40px !important;
-                max-width:none !important;
-                max-height:40px !important;
-            }
-
-            /* Never turn the whole original sidebar into our own positioned/scrollable panel. */
-            body.stm-apps-layout-2 sl-header sl-tab-bar:has(.stm-apps-nav-item),
-            body.stm-apps-layout-3 sl-header sl-tab-bar:has(.stm-apps-nav-item) {
-                overflow-x:hidden !important;
-                scrollbar-width:none !important;
-                overscroll-behavior:contain !important;
-            }
-            body.stm-apps-layout-2 sl-header sl-tab-bar:has(.stm-apps-nav-item)::-webkit-scrollbar,
-            body.stm-apps-layout-3 sl-header sl-tab-bar:has(.stm-apps-nav-item)::-webkit-scrollbar { display:none !important; }
-
-            /* Apps must behave as a real page: fully cover the current Somtoday content. */
-            #stm-apps-page {
-                z-index:14 !important;
-                background:var(--bg-neutral-none) !important;
-                isolation:isolate !important;
-            }
-            body.stm-apps-layout-2 #stm-apps-page {
-                top:0 !important;
-                left:var(--safe-area-inset-left,100px) !important;
-                right:0 !important;
-                bottom:0 !important;
-            }
-            body.stm-apps-layout-3 #stm-apps-page {
-                top:0 !important;
-                left:0 !important;
-                right:var(--safe-area-inset-right,100px) !important;
-                bottom:0 !important;
-            }
-            body.stm-apps-layout-1 #stm-apps-page,
-            body.stm-apps-layout-4 #stm-apps-page,
-            body.stm-apps-layout-5 #stm-apps-page {
-                top:64px !important;
-                bottom:var(--safe-area-inset-bottom,0) !important;
-            }
-            body.stm-apps-layout-4 #stm-apps-page {
-                left:var(--safe-area-inset-left,0) !important;
-                right:var(--safe-area-inset-right,0) !important;
-            }
+            .stm-apps-nav-item .item > i,.stm-apps-nav-item i.stm-apps-nav-icon{box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;overflow:visible!important;flex:0 0 auto!important}
+            .stm-apps-nav-item .item > i svg,.stm-apps-nav-item i.stm-apps-nav-icon svg{display:block!important;width:24px!important;height:24px!important;min-width:24px!important;min-height:24px!important;max-width:24px!important;max-height:24px!important;fill:currentColor!important}
+            body:not(.stm-apps-sidebar-layout) .stm-apps-nav-item .item > i,body:not(.stm-apps-sidebar-layout) .stm-apps-nav-item i.stm-apps-nav-icon{width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;margin:0 auto!important}
+            body.stm-apps-sidebar-layout .stm-apps-nav-item .item > i,body.stm-apps-sidebar-layout .stm-apps-nav-item i.stm-apps-nav-icon{width:100%!important;height:40px!important;min-height:40px!important;margin:0!important}
+            body:not(.stm-apps-sidebar-layout) sl-tab-bar:has(.stm-apps-nav-item){overflow-y:visible!important}
+            body.stm-apps-sidebar-layout sl-header sl-tab-bar:has(.stm-apps-nav-item){box-sizing:border-box!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;scrollbar-width:none!important;padding-bottom:0!important;justify-content:flex-start!important;align-content:flex-start!important}
+            body.stm-apps-sidebar-layout sl-header sl-tab-bar:has(.stm-apps-nav-item)::-webkit-scrollbar{display:none!important}
+            body.stm-apps-sidebar-layout sl-header sl-tab-bar:has(.stm-apps-nav-item)>sl-tab-item{flex:0 0 auto!important}
+            body.stm-apps-sidebar-layout .menu-avatar,body.stm-apps-sidebar-layout sl-header>div:first-of-type{transform:none!important}
         `;
         document.head.appendChild(style);
-    }
-
-    function clearOldBrokenOverrides() {
-        /* Remove only properties the previous Apps navigation fix wrote inline. */
-        document.querySelectorAll('sl-header sl-tab-bar').forEach(bar => {
-            if (!bar.querySelector('.stm-apps-nav-item')) return;
-            ['position','top','bottom','height','max-height','overflow-y','overflow-x'].forEach(p => bar.style.removeProperty(p));
-        });
-        document.querySelectorAll('sl-header .menu-avatar, sl-header > div:first-of-type').forEach(el => {
-            ['position','top','bottom','left','right','width','transform'].forEach(p => el.style.removeProperty(p));
-        });
     }
 
     function cleanWrongNavCopies() {
@@ -147,76 +32,75 @@
         });
     }
 
-    function applyLayoutClass() {
-        const layout = getLayout();
-        if (!document.body) return layout;
-        for (let i=1;i<=5;i++) document.body.classList.toggle(`stm-apps-layout-${i}`, layout===String(i));
-        return layout;
+    function resetSidebarInlineStyles() {
+        document.querySelectorAll('sl-header sl-tab-bar').forEach(bar => {
+            if (!bar.querySelector('.stm-apps-nav-item')) return;
+            ['top','bottom','height','max-height','overflow-y','overflow-x','position'].forEach(p=>bar.style.removeProperty(p));
+        });
+        document.querySelectorAll('.menu-avatar, sl-header > div:first-of-type').forEach(el => {
+            ['top','bottom','left','right','width','position','transform'].forEach(p=>el.style.removeProperty(p));
+        });
     }
 
-    function matchAppsItemToSibling(item, layout) {
-        const sibling = [...(item.parentElement?.children || [])].find(el => el !== item && el.matches?.('sl-tab-item'));
-        if (!sibling) return;
-
-        /* Keep the cloned button using the same item dimensions as its neighbours. */
-        const siblingItem = sibling.querySelector('.item');
-        const appItem = item.querySelector('.item');
-        if (siblingItem && appItem) {
-            const cs = getComputedStyle(siblingItem);
-            if (cs.height && cs.height !== '0px') appItem.style.height = cs.height;
-            appItem.style.minHeight = cs.minHeight;
-            appItem.style.maxHeight = cs.maxHeight;
-        }
-
-        const icon = item.querySelector('i');
-        const svg = icon?.querySelector('svg');
-        if (icon) icon.setAttribute('aria-hidden','true');
-        if (svg) {
-            svg.removeAttribute('width');
-            svg.removeAttribute('height');
-            svg.style.removeProperty('width');
-            svg.style.removeProperty('height');
-        }
-
-        /* Sidebar layouts already have the correct sizing rules in main_functions.js. */
-        if (layout === '2' || layout === '3') {
-            item.style.removeProperty('height');
-            item.style.removeProperty('max-height');
+    function clampBar(bar) {
+        const app = bar?.querySelector('.stm-apps-nav-item');
+        if (!app || bar.clientHeight <= 0) return;
+        const max = Math.max(0, app.offsetTop + app.offsetHeight - bar.clientHeight);
+        if (bar.scrollTop > max) bar.scrollTop = max;
+        if (!bar.dataset.stmAppsClampBound) {
+            bar.dataset.stmAppsClampBound = '1';
+            bar.addEventListener('scroll', () => {
+                const btn = bar.querySelector('.stm-apps-nav-item');
+                if (!btn) return;
+                const limit = Math.max(0, btn.offsetTop + btn.offsetHeight - bar.clientHeight);
+                if (bar.scrollTop > limit) bar.scrollTop = limit;
+            }, {passive:true});
+            bar.addEventListener('wheel', e => {
+                if (e.deltaY <= 0) return;
+                const btn = bar.querySelector('.stm-apps-nav-item');
+                if (!btn) return;
+                const limit = Math.max(0, btn.offsetTop + btn.offsetHeight - bar.clientHeight);
+                if (bar.scrollTop >= limit - 1) {
+                    bar.scrollTop = limit;
+                    e.preventDefault();
+                }
+            }, {passive:false});
         }
     }
 
     function fixAppsNavigation() {
         ensureStyles();
-        clearOldBrokenOverrides();
         cleanWrongNavCopies();
-        const layout = applyLayoutClass();
+        const layout = getLayout();
+        const sidebar = layout === '2' || layout === '3';
+        document.body?.classList.toggle('stm-apps-sidebar-layout', sidebar);
+        if (!sidebar) resetSidebarInlineStyles();
 
-        document.querySelectorAll('sl-header .stm-apps-nav-item').forEach(item => matchAppsItemToSibling(item, layout));
-
-        /* Keep scroll position legal, but never create extra empty scroll space. */
-        if (layout === '2' || layout === '3') {
-            document.querySelectorAll('sl-header sl-tab-bar:has(.stm-apps-nav-item)').forEach(bar => {
-                const max = Math.max(0, bar.scrollHeight - bar.clientHeight);
-                if (bar.scrollTop > max) bar.scrollTop = max;
-            });
-        }
+        document.querySelectorAll('sl-header sl-tab-bar:has(.stm-apps-nav-item)').forEach(clampBar);
+        document.querySelectorAll('.stm-apps-nav-item').forEach(item => {
+            const icon = item.querySelector('i');
+            const svg = icon?.querySelector('svg');
+            if (icon) icon.setAttribute('aria-hidden', 'true');
+            if (svg) {
+                svg.setAttribute('width', '24');
+                svg.setAttribute('height', '24');
+                svg.style.width = '24px';
+                svg.style.height = '24px';
+            }
+        });
     }
 
     let scheduled = false;
     function scheduleFix() {
         if (scheduled) return;
         scheduled = true;
-        requestAnimationFrame(() => {
-            scheduled = false;
-            fixAppsNavigation();
-        });
+        requestAnimationFrame(() => { scheduled = false; fixAppsNavigation(); });
     }
 
-    const observer = new MutationObserver(scheduleFix);
-    observer.observe(document.documentElement, {childList:true, subtree:true});
-    window.addEventListener('resize', scheduleFix);
-    window.addEventListener('hashchange', scheduleFix);
-    window.addEventListener('popstate', scheduleFix);
-    setInterval(scheduleFix, 700);
-    setTimeout(scheduleFix, 100);
+    new MutationObserver(scheduleFix).observe(document.documentElement,{childList:true,subtree:true});
+    window.addEventListener('resize',scheduleFix);
+    window.addEventListener('hashchange',scheduleFix);
+    window.addEventListener('popstate',scheduleFix);
+    setInterval(scheduleFix,700);
+    setTimeout(scheduleFix,100);
 })();
