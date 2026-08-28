@@ -28,8 +28,35 @@
     function createPanel(){const root=document.createElement('section');root.id=ROOT_ID;root.className='stm-sticky-panel';root.innerHTML=`<div class="stm-sticky-panel-header"><div><span class="stm-sticky-kicker">Somtoday Mod</span><h3>Sticky Notes</h3></div><span class="stm-sticky-pin">●</span></div><button type="button" class="stm-sticky-add">+ <span>Sticky Note Maken</span></button><div id="stm-sticky-list" class="stm-sticky-list"></div>`;root.querySelector('.stm-sticky-add').addEventListener('click',()=>openModal());return root}
     function cleanup(){document.getElementById(ROOT_ID)?.remove();document.querySelectorAll(`.${HOME_CLASS}`).forEach(el=>el.classList.remove(HOME_CLASS))}
 
-    function syncSwitch(sw,value){sw.setAttribute('aria-checked',String(value));sw.setAttribute('data-checked',String(value));sw.checked=value;if(value){sw.setAttribute('checked','');sw.classList.add('checked')}else{sw.removeAttribute('checked');sw.classList.remove('checked')}}
-    async function injectSetting(){const category=document.getElementById('category-extra');if(!category||document.getElementById(SETTING_ID))return;const enabled=await isEnabled();const row=document.createElement('div');row.id=SETTING_ID;row.className='stm-sticky-setting-row';row.innerHTML=`<div class="stm-sticky-setting-copy"><b>Sticky Notes op Start</b><span>Toon het Sticky Notes-vak naast je laatste cijfer op de startpagina.</span></div><hmy-switch class="stm-sticky-setting-switch" tabindex="0" role="switch"></hmy-switch>`;category.appendChild(row);const sw=row.querySelector('hmy-switch');syncSwitch(sw,enabled);const toggle=async event=>{event.preventDefault();event.stopPropagation();const next=!(await isEnabled());await setEnabled(next);syncSwitch(sw,next)};sw.addEventListener('click',toggle);sw.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){toggle(event)}})}
+    async function injectSetting(){
+        const category=document.getElementById('category-extra');
+        if(!category||document.getElementById(SETTING_ID))return;
+
+        const tasksCheckbox=category.querySelector('#bools16');
+        if(!tasksCheckbox)return;
+
+        const tasksRow=tasksCheckbox.closest('div');
+        if(!tasksRow)return;
+
+        const row=tasksRow.cloneNode(true);
+        row.id=SETTING_ID;
+
+        const title=row.querySelector('h3');
+        const checkbox=row.querySelector('input[type="checkbox"]');
+        const label=row.querySelector('label.switch');
+        if(!checkbox||!label)return;
+
+        if(title)title.textContent='Sticky Notes op Start';
+        checkbox.id='stm-sticky-notes-enabled';
+        checkbox.title='Sticky Notes op Start';
+        checkbox.classList.remove('mod-custom-setting','mod-modified');
+        checkbox.removeAttribute('oninput');
+        label.setAttribute('for',checkbox.id);
+        checkbox.checked=await isEnabled();
+        checkbox.addEventListener('change',async()=>{await setEnabled(checkbox.checked)});
+
+        tasksRow.insertAdjacentElement('afterend',row);
+    }
 
     async function mount(){injectSetting();if(!(await isEnabled())){cleanup();return}const home=getVisibleHome();if(!home){cleanup();return}document.querySelectorAll(`.${HOME_CLASS}`).forEach(el=>{if(el!==home)el.classList.remove(HOME_CLASS)});home.classList.add(HOME_CLASS);const existing=document.getElementById(ROOT_ID),root=existing||createPanel();if(root.parentElement!==home)home.appendChild(root);if(!positionPanel(home,root)){root.remove();return}if(!existing)renderNotes()}
     let timer;const observer=new MutationObserver(()=>{clearTimeout(timer);timer=setTimeout(mount,100)});observer.observe(document.documentElement,{childList:true,subtree:true});window.addEventListener('hashchange',mount);window.addEventListener('popstate',mount);window.addEventListener('resize',()=>{clearTimeout(timer);timer=setTimeout(mount,80)});setInterval(mount,900);setTimeout(mount,200);
