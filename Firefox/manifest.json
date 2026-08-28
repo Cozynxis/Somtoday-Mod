@@ -25,7 +25,8 @@
                 "scripts/the_escape.js",
                 "scripts/grade_defender.js",
                 "scripts/gradient_background.js",
-                "scripts/sticky_notes.js"
+                "scripts/sticky_notes.js",
+                "scripts/apps_nav_fix.js"
             ],
             "css": [
                 "css/night.css",
