@@ -27,7 +27,8 @@
                 "scripts/gradient_background.js",
                 "scripts/sticky_notes.js",
                 "scripts/apps_nav_fix.js",
-                "scripts/apps_enhancements.js"
+                "scripts/apps_enhancements.js",
+                "scripts/apps_library.js"
             ],
             "css": [
                 "css/night.css",
