@@ -28,7 +28,8 @@
                 "scripts/sticky_notes.js",
                 "scripts/apps_nav_fix.js",
                 "scripts/apps_enhancements.js",
-                "scripts/apps_library.js"
+                "scripts/apps_library.js",
+                "scripts/whats_new.js"
             ],
             "css": [
                 "css/night.css",
