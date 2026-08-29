@@ -6,11 +6,9 @@ const ROOT_ID = 'stm-whats-new';
 const VERSION = chrome.runtime.getManifest().version;
 
 const CHANGES = [
-  ['Apps', 'Een vernieuwde Apps-pagina met zoeken, vastpinnen en snelle links.'],
-  ['Appbibliotheek', 'Meer dan 100 handige school-, leer- en productiviteitsapps.'],
-  ['Slimme app-iconen', 'Apps krijgen automatisch het herkenbare logo van de website.'],
+  ['Apps', 'Een nieuwe Apps-pagina met zoeken, vastpinnen en snelle links. Met apps kun je makkelijk op sites komen zonder steeds linkjes in te typen.'],
   ['Sticky Notes', 'Maak handige notities op je Somtoday-startpagina.'],
-  ['Personalisatie', 'Meer mogelijkheden om Somtoday-Mod naar jouw smaak in te richten.']
+  ['Gradient achtergronden', 'Nieuwe gradient achtergronden zijn toegevoegd. Je kunt ze vinden bij achtergronden, en dan gradient in de mod settings.']
 ];
 
 function esc(value = '') {
