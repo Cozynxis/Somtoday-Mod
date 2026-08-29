@@ -26,8 +26,7 @@
                 "scripts/grade_defender.js",
                 "scripts/gradient_background.js",
                 "scripts/sticky_notes.js",
-                "scripts/apps_nav_fix.js",
-                "scripts/announcements.js"
+                "scripts/apps_nav_fix.js"
             ],
             "css": [
                 "css/night.css",
@@ -40,8 +39,7 @@
                 "css/minigames.css",
                 "css/easter-eggs.css",
                 "css/gradient-background.css",
-                "css/sticky-notes.css",
-                "css/announcements.css"
+                "css/sticky-notes.css"
             ],
             "matches": [
                 "*://*.somtoday.nl/*",
@@ -56,8 +54,7 @@
     ],
     "host_permissions": [
         "*://*.somtoday.nl/*",
-        "*://som.today/*",
-        "https://mkpmpakycvzmzzbqdcjc.supabase.co/*"
+        "*://som.today/*"
     ],
     "options_ui": {
         "page": "options.html",
