@@ -1,5 +1,7 @@
 // SERVICE WORKER
 
+const WHATS_NEW_PENDING_KEY = 'somtoday_mod_whats_new_pending_v1';
+
 function enableNewFeatures() {
     // Sticky Notes = bools19, Apps = bools20.
     // Always enable both when this extension is installed or updated so every
@@ -19,7 +21,18 @@ function enableNewFeatures() {
 
 chrome.runtime.onInstalled.addListener(details => {
     if (details.reason === 'install' || details.reason === 'update') {
-        enableNewFeatures().then(() => {
+        const version = chrome.runtime.getManifest().version;
+        Promise.all([
+            enableNewFeatures(),
+            chrome.storage.local.set({
+                [WHATS_NEW_PENDING_KEY]: {
+                    version,
+                    reason: details.reason,
+                    previousVersion: details.previousVersion || null,
+                    createdAt: Date.now()
+                }
+            })
+        ]).then(() => {
             if (details.reason === 'install') {
                 chrome.storage.local.set({ enabled: true });
                 chrome.runtime.openOptionsPage();
