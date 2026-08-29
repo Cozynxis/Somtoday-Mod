@@ -7,7 +7,7 @@ const VERSION = chrome.runtime.getManifest().version;
 
 // Zet hier je eigen directe PNG/JPG/WebP URL neer.
 // Laat leeg ('') om automatisch het ingebouwde Chromium/icon128.png te gebruiken.
-const MOD_ICON_URL = '';
+const MOD_ICON_URL = 'https://store-images.s-microsoft.com/image/apps.22688.d66eccb1-5546-4258-9937-c5a2b3c6de09.b72747a4-8c1a-4791-9917-208ab2f3e4ee.5c27b707-7908-4947-a651-b8947489c9a7';
 const FALLBACK_ICON_URL = chrome.runtime.getURL('icon128.png');
 
 const CHANGES = [
